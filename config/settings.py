@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from django.core.management.utils import get_random_secret_key
-from dotenv import load_dotenv  # dotenv 모듈 임포트 추가
-from django.core.exceptions import ImproperlyConfigured
+# from django.core.management.utils import get_random_secret_key
+# from dotenv import load_dotenv  # dotenv 모듈 임포트 추가
+# from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,20 +27,20 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'ai_music', 'ComMU_code', 'result', 'midi_files')
 
-# .env 파일 로드
-load_dotenv()  # .env 파일 로드
-
-# API 키 읽어오기
-API_KEY = os.getenv('API_KEY')
-
-# API 키가 설정되지 않은 경우 예외 발생
-if not API_KEY:
-    raise ImproperlyConfigured("API_KEY is not set in .env file")
-
-# openai 모듈 설정
-import openai
-
-openai.api_key = API_KEY
+# # .env 파일 로드
+# load_dotenv()  # .env 파일 로드
+#
+# # API 키 읽어오기
+# API_KEY = os.getenv('API_KEY')
+#
+# # API 키가 설정되지 않은 경우 예외 발생
+# if not API_KEY:
+#     raise ImproperlyConfigured("API_KEY is not set in .env file")
+#
+# # openai 모듈 설정
+# import openai
+#
+# openai.api_key = API_KEY
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -48,7 +48,7 @@ openai.api_key = API_KEY
 SECRET_KEY = 'django-insecure-oz)%)cjz+eh144^4q$0$&8hjau&stbhf#ngs@mrn-7yuq2ygq5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '*'
