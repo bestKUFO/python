@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>알람</title>
+    <style>
+        .body {
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        }
+        .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+        }
+        .box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 430px;
+            height: 730px;
+            width: 100%;
+        }
+        .box_box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 410px;
+            height: 630px;
+            width: 100%;
+        }
+        .center {
+            text-align: center;
+        }
+        .logo {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-family: 'Pacifico' !important;
+        }
+        .name {
+            font-family: 'Hi Melody', cursive;
+        }
+        .material-symbols-outlined {
+            font-variation-settings:
+                    'FILL' 0,
+                    'wght' 400,
+                    'GRAD' 0,
+                    'opsz' 48
+        }
+        .image {
+            width: 80%;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .button-box a {
+            display: block;
+            width: 180px;
+            height: 50px;
+            background-color: #ccc;
+            color: #fff;
+            text-decoration: none;
+            line-height: 50px;
+            border-radius: 5px;
+        }
+        .button-box a:hover {
+            background-color: #aaa;
+        }
+        .navbar-nav {
+            display: flex;
+            justify-content: center;
+        }
+        .navbar-nav .nav-item:not(:last-child) {
+            margin-right: 0px; /* 버튼 사이의 간격 조절 */
+        }
+        .home-button {
+            top: 20px;
+            left: 20px;
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="box">
+        <a href="{% url 'ai_music:home' %}" class="home-button">◀</a>
+        <div class="box_box">
+            <div class="center">
+                <!-- 시계 -->
+                <div class="clock" id="clock">00:00:00</div>
+                <h1>알람</h1>
+                <!-- 목표시간 -->
+                <div class="target-clock" id="target-clock">00:00:00</div>
+                <!-- 버튼 -->
+                <div class="button-box">
+                    <button id="start-btn">시작</button>
+                    <button id="stop-btn">정지</button>
+                </div>
+                <!-- 시간 입력 -->
+                <div class="time-input">
+                    <label for="hour-input">시:</label>
+                    <input type="text" id="hour-input" placeholder="00" maxlength="2">
+                    <label for="minute-input">분:</label>
+                    <input type="text" id="minute-input" placeholder="00" maxlength="2">
+                    <button id="set-time-btn">설정</button>
+                </div>
+                <!-- 소리 조절 슬라이더 -->
+                <h3>Volume</h3>
+                <input type="range" min="0" max="100" value="50" class="volume-slider" id="volume-slider">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        // JavaScript 코드 추가
+        const clockElement = document.getElementById('clock');
+        const targetClockElement = document.getElementById('target-clock');
+        const startButton = document.getElementById('start-btn');
+        const stopButton = document.getElementById('stop-btn');
+        const volumeSlider = document.getElementById('volume-slider');
+        const hourInput = document.getElementById('hour-input');
+        const minuteInput = document.getElementById('minute-input');
+        const setTimeButton = document.getElementById('set-time-btn');
+
+        let timerId;
+        let time = 0;
+
+        function updateClock() {
+            const currentDateTime = new Date();
+            const hours = String(currentDateTime.getHours()).padStart(2, '0');
+            const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+            const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
+
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
+            clockElement.textContent = formattedTime;
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                time++;
+                const hours = Math.floor(time / 3600);
+                const minutes = Math.floor((time % 3600) / 60);
+                const seconds = time % 60;
+
+                const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                clockElement.textContent = formattedTime;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerId);
+        }
+
+        function setTime() {
+            const currentDateTime = new Date();
+            const currentHours = currentDateTime.getHours();
+            const currentMinutes = currentDateTime.getMinutes();
+            const currentSeconds = currentDateTime.getSeconds();
+
+            const selectedHours = parseInt(hourInput.value, 10) || 0;
+            const selectedMinutes = parseInt(minuteInput.value, 10) || 0;
+
+            let alarmHours, alarmMinutes;
+            if (selectedHours > currentHours || (selectedHours === currentHours && selectedMinutes >= currentMinutes)) {
+                // 알람 설정 시간이 현재 시간보다 나중인 경우
+                alarmHours = selectedHours;
+                alarmMinutes = selectedMinutes;
+            } else {
+                // 알람 설정 시간이 현재 시간보다 이전인 경우 다음 날로 설정
+                alarmHours = selectedHours + 24;
+                alarmMinutes = selectedMinutes;
+            }
+
+            const timeDifference = (alarmHours - currentHours) * 3600 + (alarmMinutes - currentMinutes) * 60 - currentSeconds;
+
+            time = timeDifference;
+
+            const formattedTime = `${String(selectedHours).padStart(2, '0')}:${String(selectedMinutes).padStart(2, '0')}:00`;
+            targetClockElement.textContent = formattedTime;
+        }
+
+        startButton.addEventListener('click', startTimer);
+        stopButton.addEventListener('click', stopTimer);
+        setTimeButton.addEventListener('click', setTime);
+
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            // 볼륨 조절에 대한 동작 구현
+        });
+
+        // 매 초마다 시간 업데이트
+        setInterval(updateClock, 1000);
+
+</script>
+</body>
+</html>
